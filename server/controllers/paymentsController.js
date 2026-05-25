@@ -78,19 +78,14 @@ export const verifyPayment = async (req, res) => {
         const userResult = await query('SELECT email, name FROM users WHERE id = $1', [user_id]);
         const { email, name } = userResult.rows[0];
 
-        try {
-            transporter.sendMail({
+        transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: email,
                 subject: `Plan upgraded to ${planName}!`,
                 text: `Hi ${name}, your plan has been successfully upgraded to ${planName}. Enjoy the new features!`
-            });
-            
-        } catch (emailErr) {
-            console.error("Email failed:", emailErr.message);
-        }
+            }).catch(emailErr => console.error("Email failed:", emailErr.message));
 
-        res.json({ message: "Payment successful", plan: planName })
+        res.json({ message: "Payment successful", plan: planName });
 
     } catch (err) {
         res.status(500).json({ error: err.message });
