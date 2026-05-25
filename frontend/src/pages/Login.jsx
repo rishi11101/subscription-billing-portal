@@ -1,17 +1,19 @@
 import { useState } from "react"
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const { user, login } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
+        setLoading(true);
         try {
             const response = await api.post('/auth/login', { email, password });
 
@@ -21,6 +23,8 @@ const Login = () => {
         } catch (err) {
             console.log(err);
             alert('Invalid credentials');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -66,8 +70,8 @@ const Login = () => {
                   />
               </div>
               
-              <button onClick={handleLogin} className="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-500 transition-all shadow-[0_0_15px_-3px_rgba(16,185,129,0.4)] text-sm mt-2">
-                  Sign in
+              <button onClick={handleLogin} disabled={loading} className="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-500 transition-all shadow-[0_0_15px_-3px_rgba(16,185,129,0.4)] text-sm mt-2 disabled:opacity-60">
+                    {loading ? 'Signing in...' : 'Sign in'}
               </button>
           </div>
 

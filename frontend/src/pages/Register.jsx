@@ -9,10 +9,12 @@ const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleRegister = async () => {
+        setLoading(true);
           try {
               const response = await api.post('/auth/register', { name, email, password });
 
@@ -25,6 +27,8 @@ const Register = () => {
           } catch (err) {
               console.log(err);
               alert('Registration failed. Try again.');
+          } finally {
+            setLoading(false);
           }
     };
 
@@ -79,8 +83,8 @@ const Register = () => {
                         className="w-full px-4 py-2.5 bg-zinc-950/50 border border-white/10 rounded-lg text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" 
                     />
                 </div>
-                <button onClick={handleRegister} className="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-500 transition-all shadow-[0_0_15px_-3px_rgba(16,185,129,0.4)] text-sm mt-2">
-                    Create account
+                <button onClick={handleRegister} disabled={loading} className="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-500 transition-all shadow-[0_0_15px_-3px_rgba(16,185,129,0.4)] text-sm mt-2 disabled:opacity-60">
+                    {loading ? 'Creating account...' : 'Create account'}
                 </button>
             </div>
 
