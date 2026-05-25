@@ -79,7 +79,7 @@ export const verifyPayment = async (req, res) => {
         const { email, name } = userResult.rows[0];
 
         try {
-            await transporter.sendMail({
+            transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: email,
                 subject: `Plan upgraded to ${planName}!`,
