@@ -5,12 +5,11 @@ A full-stack SaaS billing portal with Razorpay payment integration, plan-based f
 🔗 [Live Demo](https://subscription-billing-portal.vercel.app)
 
 ## Features
-- JWT authentication with protected routes
+- JWT authentication with protected routes and rate limiting
 - Three-tier plan system — Free, Basic, Pro
-- Razorpay payment gateway integration with server-side signature verification
-- Plan-based feature access control (locked/unlocked sections)
-- Transactional email on successful payment via Nodemailer
-- Responsive dashboard with analytics and priority support sections
+- Razorpay payment gateway with server-side HMAC-SHA256 signature verification
+- Plan-based feature access control with locked/unlocked dashboard sections
+- Transactional email confirmation on successful payment via Nodemailer
 
 ## Tech Stack
 **Frontend:** React.js, Tailwind CSS, Context API  
@@ -18,12 +17,31 @@ A full-stack SaaS billing portal with Razorpay payment integration, plan-based f
 **Database:** PostgreSQL (Neon)  
 **Payments:** Razorpay  
 **Auth:** JWT  
-**Email:** Nodemailer
+**Email:** Nodemailer  
+**Deployment:** Vercel, Render, Neon  
 
-## Deployment
-- Frontend deployed on Vercel
-- Backend deployed on Render
-- PostgreSQL hosted on Neon
+## Database Schema
+```
+users       — id, name, email, password, plan
+plans       — id, name, price
+payments    — id, user_id, plan_id, razorpay_order_id, status
+```
+
+## API Routes
+```
+POST   /api/auth/register
+POST   /api/auth/login
+GET    /api/users/me
+GET    /api/plans
+POST   /api/payments/create-order
+POST   /api/payments/verify
+```
+
+## Challenges
+
+**Payment response blocked by email timeout**  
+After successful payment, the API response was hanging for 2-3 minutes before reaching the frontend. Root cause was `await transporter.sendMail()` — Gmail SMTP connections were timing out on Render's free tier, blocking the entire response. Removed `await` and used `.catch()` for error handling — payment response now returns instantly while email sends in background.
+
 
 ## Setup & Installation
 
@@ -62,12 +80,11 @@ VITE_RAZORPAY_KEY_ID=your_razorpay_key
 ```
 
 ## Test Payment
-Use Razorpay test card:
+UPI: `success@razorpay` (any 6-digit OTP)
+
+Or card:
 ```
 Card: 5267 3181 8797 5449
 CVV: 123
 Expiry: 12/26
-OTP: any 6 digits (e.g. `123456`)
 ```
-
-Or UPI: `success@razorpay`
